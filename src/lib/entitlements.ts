@@ -118,3 +118,8 @@ export function canCreateCv(plan: Plan, currentCount: number): boolean {
 export const PREMIUM_BENEFITS: string[] = Object.values(FEATURES).map(
   (f) => f.label,
 );
+
+export const PLAN_LABELS: Record<Plan, string> = {
+  free: 'Free',
+  premium: 'Premium',
+};

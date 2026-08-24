@@ -1,7 +1,7 @@
 {
   "name": "cvforge",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "CVForge — a professional CV/Resume builder. React + TypeScript + Vite + Tailwind.",
   "scripts": {

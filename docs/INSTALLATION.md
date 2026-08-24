@@ -19,7 +19,10 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. Hot module replacement is enabled.
+Open http://localhost:5173 — this shows the landing page; click **Open the
+app** (or visit `/#/app`) for the editor. Hot module replacement is
+enabled. In `vite dev`, the internal test checkout at `/#/checkout` is
+available automatically.
 
 ## Production build
 
@@ -38,28 +41,54 @@ npm test            # Vitest unit tests
 
 ## Configuration
 
-All monetization settings live in `src/config/monetization.ts`:
+All monetization settings are centralized in `src/config/monetization.ts`
+and overridable at build time via environment variables:
 
-| Setting | Default | Description |
+| Variable | Default | Description |
 | --- | --- | --- |
-| `premiumPrice` | `9.99` | One-time price shown in the upgrade modal |
-| `currency` | `'USD'` | ISO currency for price formatting |
-| `upgradeUrl` | `https://example.com/cvforge/upgrade` | Checkout URL opened by "Continue to checkout" |
-| `devUnlockPremium` | `false` | Demo switch: shows an "Activate Premium (demo)" button in the upgrade modal. Also enabled by building with `VITE_DEV_UNLOCK_PREMIUM=true`. Keep `false` in production. |
+| `VITE_PREMIUM_PRICE` | `9.99` | One-time price shown in the upgrade modal and pricing pages |
+| `VITE_PREMIUM_CURRENCY` | `USD` | ISO 4217 currency for price formatting |
+| `VITE_UPGRADE_URL` | *(unset)* | Real checkout URL (Stripe Payment Link, Lemon Squeezy, Paddle, …). When set, upgrade buttons open it in a new tab. |
+| `VITE_ENABLE_TEST_MODE` | *(unset)* | `true` enables the internal test checkout page at `/#/checkout` and routes upgrade buttons to it. For development/QA only — **never enable in production**. In `vite dev`, test mode is always on. |
+
+### Behaviour matrix
+
+| upgradeUrl | testMode | Upgrade button behaviour |
+| --- | --- | --- |
+| set | any | Opens the configured checkout URL in a new tab |
+| unset | on | Opens the internal test checkout (`#/checkout`) — no payment processed |
+| unset | off | Shows "checkout not yet configured" — sends users nowhere |
+
+CVForge never links to placeholder or documentation domains.
 
 ### Enabling real payments later
 
 1. Create a checkout/payment link with your provider (Stripe Payment Link,
    Lemon Squeezy, Paddle, …).
-2. Set `upgradeUrl` to that link.
+2. Build with `VITE_UPGRADE_URL` set to that link (keep test mode off).
 3. After a successful purchase, set the browser key `cvforge:plan` to
    `"premium"` in `localStorage` (e.g. on your success redirect page). The
    app reads this key on load. No other code changes are needed.
+
+### Testing both plans
+
+In development (`npm run dev`) or a build made with
+`VITE_ENABLE_TEST_MODE=true`:
+
+1. Open `/#/checkout` (or click any 🔒 Premium feature → Continue to
+   checkout).
+2. Use **Test Premium entitlement** / **Test Free entitlement** to flip the
+   local plan flag instantly.
+
+This never claims a payment occurred, stores no credentials, and makes no
+network calls.
 
 ## Troubleshooting
 
 - **`npm install` fails on engine versions** — upgrade Node.js to 18+.
 - **Blank page after deploy** — make sure your host serves `index.html` for
-  unknown paths (SPA fallback) or deploy at the domain root.
+  unknown paths (SPA fallback) or deploy at the domain root. In-app
+  navigation uses hash routes (`#/app`, `#/checkout`), so a plain static
+  host works.
 - **Data disappeared** — browser storage was cleared; restore from a JSON
   export (Premium) if you have one.

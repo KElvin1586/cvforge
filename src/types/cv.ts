@@ -221,7 +221,7 @@ export function createSampleCv(): CvDocument {
   cv.data.personal = {
     fullName: 'Alex Carter',
     jobTitle: 'Senior Frontend Engineer',
-    email: 'alex.carter@example.com',
+    email: 'alex@alexcarter.dev',
     phone: '+1 (555) 123-4567',
     location: 'Austin, TX',
     website: 'https://alexcarter.dev',
@@ -277,7 +277,7 @@ export function createSampleCv(): CvDocument {
     {
       id: uid(),
       name: 'CVForge',
-      link: 'https://github.com/example/cvforge',
+      link: 'https://github.com/alexcarter/cvforge',
       technologies: 'React, TypeScript, Tailwind',
       description:
         'Open-source CV builder with live preview, templates, and local-first storage.',
@@ -301,7 +301,7 @@ export function createSampleCv(): CvDocument {
       name: 'Jordan Lee',
       title: 'Engineering Manager',
       company: 'Northwind Labs',
-      email: 'jordan.lee@example.com',
+      email: 'jordan.lee@northwindlabs.dev',
       phone: '+1 (555) 987-6543',
     },
   ];

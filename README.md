@@ -5,6 +5,15 @@ CVForge is a production-ready, local-first CV/resume builder built with
 database, and no tracking — all data is stored in your browser's
 `localStorage` and never leaves your device.
 
+## Pages
+
+- **`#/` — Landing page:** product overview, features, Free/Premium pricing
+  comparison, privacy statement. (The default page.)
+- **`#/app` — The app:** full CV editor with live preview, templates,
+  styling, cover letters, and ATS tools.
+- **`#/checkout` — Internal test checkout:** development/test-builds only;
+  flips the local plan flag for QA without any payment.
+
 ## Features
 
 ### Editor
@@ -24,7 +33,7 @@ database, and no tracking — all data is stored in your browser's
 ### Templates & styling
 - **Free:** Classic, Modern
 - **Premium:** Elegant, ATS Pro, Bold
-- Accent colors, font family, font size, and layout density controls
+- Accent colors, font family, font size, and layout density controls (Premium)
 
 ### Output
 - Print-optimized stylesheet (`@page` A4, print-color-adjust)
@@ -60,9 +69,12 @@ database, and no tracking — all data is stored in your browser's
 | ATS formatting tools | — | ✅ |
 
 Premium gating is centralized in `src/lib/entitlements.ts`. Locked actions
-open an upgrade modal instead of executing. The upgrade modal links to a
-**configurable checkout URL** (`src/config/monetization.ts`) — no fake
-payments or license keys are implemented.
+open an upgrade modal instead of executing. The upgrade flow routes to a
+**configurable checkout URL** (`VITE_UPGRADE_URL`), or — in development/test
+builds — to an internal test checkout page. There are **no fake payments,
+no license keys, and no placeholder links**. See
+[docs/PRICING.md](docs/PRICING.md) and
+[docs/COMMERCIAL-LICENSE.md](docs/COMMERCIAL-LICENSE.md).
 
 ## Quick start
 
@@ -71,8 +83,9 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:5173. See [docs/INSTALLATION.md](docs/INSTALLATION.md)
-for details and [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for a full walkthrough.
+Open http://localhost:5173. See [docs/INSTALLATION.md](docs/INSTALLATION.md)
+for details and [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for a full
+walkthrough.
 
 ## Scripts
 
@@ -83,21 +96,25 @@ for details and [docs/USER-GUIDE.md](docs/USER-GUIDE.md) for a full walkthrough.
 | `npm run preview` | Serve the production build locally |
 | `npm run typecheck` | TypeScript check only |
 | `npm run lint` | ESLint |
-| `npm test` | Vitest unit tests (entitlements, model, storage, ATS) |
+| `npm test` | Vitest unit tests (entitlements, model, storage, ATS, monetization, routing) |
 
 ## Project structure
 
 ```
 src/
-  config/monetization.ts     # price, currency, upgrade URL, dev-unlock flag
+  config/monetization.ts     # price, currency, upgrade URL, test mode
   lib/
     entitlements.ts          # plan/feature matrix — single source of truth
+    router.ts                # tiny hash router (landing / app / checkout)
     storage.ts               # localStorage persistence
     importExport.ts          # JSON export + validating importer
     ats.ts                   # ATS checks & keyword analysis
   state/
     AppContext.tsx           # CVs, plan, theme, versions (reducer)
     UpgradeContext.tsx       # requireFeature() gating + upgrade modal
+  pages/
+    LandingPage.tsx          # marketing page with pricing comparison
+    TestCheckoutPage.tsx     # dev/test-only entitlement switcher
   components/
     editor/                  # forms for every CV section, style panel
     preview/                 # A4 page wrapper + 5 templates
@@ -106,7 +123,9 @@ src/
     AtsPanel.tsx             # premium ATS tools
     UpgradeModal.tsx         # paywall modal
   test/                      # vitest suites
-docs/                        # user guide, installation, deployment
+docs/                        # user guide, installation, deployment,
+                             # pricing, commercial license
+public/favicon.svg           # app icon
 ```
 
 ## Security & privacy
@@ -114,7 +133,8 @@ docs/                        # user guide, installation, deployment
 - No secrets, API keys, or credentials anywhere in the codebase
 - No network calls at runtime; CV data stays in browser storage
 - Imported JSON is strictly validated and sanitized before use
+- No `dangerouslySetInnerHTML`; all user content is rendered as text
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE.md](LICENSE.md).

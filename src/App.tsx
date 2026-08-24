@@ -9,6 +9,9 @@ import { CvPreview } from './components/preview/CvPreview';
 import { CoverLetterEditor } from './components/CoverLetterEditor';
 import { AtsPanel } from './components/AtsPanel';
 import { createEmptyCv, createSampleCv } from './types/cv';
+import { useHashRoute } from './lib/router';
+import { LandingPage } from './pages/LandingPage';
+import { TestCheckoutPage } from './pages/TestCheckoutPage';
 
 type Tab = 'editor' | 'coverLetter' | 'ats';
 
@@ -144,11 +147,18 @@ function Shell() {
   );
 }
 
+function Routed() {
+  const route = useHashRoute();
+  if (route === 'app') return <Shell />;
+  if (route === 'checkout') return <TestCheckoutPage />;
+  return <LandingPage />;
+}
+
 export default function App() {
   return (
     <AppProvider>
       <UpgradeProvider>
-        <Shell />
+        <Routed />
       </UpgradeProvider>
     </AppProvider>
   );

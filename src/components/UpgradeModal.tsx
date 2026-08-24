@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { MONETIZATION, formatPremiumPrice } from '../config/monetization';
+import {
+  MONETIZATION,
+  formatPremiumPrice,
+  resolveUpgradeHref,
+} from '../config/monetization';
 import { PREMIUM_BENEFITS, type FeatureInfo } from '../lib/entitlements';
-import { useApp } from '../state/AppContext';
 
 interface UpgradeModalProps {
   open: boolean;
@@ -10,7 +13,6 @@ interface UpgradeModalProps {
 }
 
 export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
-  const { dispatch } = useApp();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -27,6 +29,9 @@ export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
   }, [open, onClose]);
 
   if (!open) return null;
+
+  const upgradeHref = resolveUpgradeHref();
+  const isExternal = upgradeHref !== null && !upgradeHref.startsWith('#');
 
   return (
     <div
@@ -85,25 +90,24 @@ export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
         </p>
 
         <div className="mt-4 flex flex-col gap-2">
-          <a
-            href={MONETIZATION.upgradeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Continue to checkout →
-          </a>
-          {MONETIZATION.devUnlockPremium && (
-            <button
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'SET_PLAN', plan: 'premium' });
-                onClose();
-              }}
-              className="rounded-lg border border-dashed border-slate-300 px-4 py-2 text-xs text-slate-500 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700"
+          {upgradeHref ? (
+            <a
+              href={upgradeHref}
+              onClick={onClose}
+              {...(isExternal
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
+              className="rounded-lg bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Activate Premium (demo mode — no payment)
-            </button>
+              Continue to checkout →
+            </a>
+          ) : (
+            <p
+              role="status"
+              className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+            >
+              Checkout is not configured on this deployment yet.
+            </p>
           )}
           <button
             type="button"
@@ -113,8 +117,20 @@ export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
             Maybe later
           </button>
         </div>
+
         <p className="mt-3 text-xs text-slate-400">
-          Your CV data stays on this device. Checkout opens in a new tab.
+          Your CV data stays on this device.
+          {isExternal && ' Checkout opens in a new tab.'}
+          {!isExternal && upgradeHref && (
+            <span className="font-medium text-amber-600 dark:text-amber-400">
+              {' '}
+              Development test mode: the checkout page is internal and processes
+              no real payment.
+            </span>
+          )}
+          {!upgradeHref && MONETIZATION.testMode === false && (
+            ' The site owner needs to configure the checkout URL.'
+          )}
         </p>
       </div>
     </div>

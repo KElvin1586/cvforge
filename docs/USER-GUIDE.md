@@ -2,9 +2,11 @@
 
 ## Getting started
 
-When you open CVForge for the first time, a sample CV ("Alex Carter") is
-loaded so you can see every feature in action. Everything you type is saved
-automatically to your browser — there is no save button and no account.
+CVForge opens on a landing page with the product overview and pricing.
+Click **Open the app** (or visit `/#/app`) to start building. When you open
+the app for the first time, a sample CV ("Alex Carter") is loaded so you can
+see every feature in action. Everything you type is saved automatically to
+your browser — there is no save button and no account.
 
 ## The workspace
 
@@ -91,6 +93,22 @@ Open the **ATS Check** tab:
 
 Click 🌙 / ☀️ in the header. Your choice is remembered; the default follows
 your operating system's preference.
+
+## Upgrading to Premium
+
+Click any 🔒 Premium feature (or the **Upgrade** button in the header) to
+open the upgrade modal, which lists everything Premium includes and the
+one-time price. **Continue to checkout** opens the checkout link configured
+by the site owner. No payment is processed inside CVForge itself.
+
+### Trying Premium in a development build
+
+On development/test builds (`npm run dev`, or a build made with
+`VITE_ENABLE_TEST_MODE=true`), the upgrade flow opens an internal test
+checkout page (`/#/checkout`) instead. It is clearly labelled as a
+development tool: it flips the plan flag stored in your browser between
+Free and Premium so you can test both experiences. It processes, simulates,
+and claims **no** payment. Production builds have this page disabled.
 
 ## Privacy
 

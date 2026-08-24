@@ -2,31 +2,42 @@
 
 CVForge is a fully static app — `npm run build` produces a self-contained
 `dist/` directory that any static host can serve. There is no server-side
-code, no environment secrets, and no database.
+code, no environment secrets, and no database. Routing is hash-based
+(`#/`, `#/app`, `#/checkout`), so no rewrite rules are required.
 
 ## Build
 
 ```bash
 npm install
+
+# Production build with your real checkout configuration:
+VITE_UPGRADE_URL="https://your-provider.com/checkout-link" \
+VITE_PREMIUM_PRICE="9.99" \
+VITE_PREMIUM_CURRENCY="USD" \
 npm run build
 ```
 
 Deploy the contents of `dist/`.
+
+> Do **not** set `VITE_ENABLE_TEST_MODE` for production builds — it enables
+> the internal test checkout, which lets any visitor grant themselves
+> Premium locally.
 
 ## Static hosts
 
 ### Netlify
 - Build command: `npm run build`
 - Publish directory: `dist`
+- Set the `VITE_*` variables under Site settings → Environment variables
 
 ### Vercel
 - Framework preset: **Vite** (build command and output directory are
   auto-detected: `npm run build`, `dist`)
+- Set the `VITE_*` variables in Project → Settings → Environment Variables
 
 ### GitHub Pages
 ```bash
 npm run build
-# then publish dist/ with any pages action, e.g.:
 npx gh-pages -d dist
 ```
 If deploying under a project subpath (`user.github.io/cvforge/`), set
@@ -42,7 +53,7 @@ lifetimes for `assets/*` (they are content-hashed) are recommended.
 
 ## SPA fallback
 
-The app is a single-page bundle with no client-side routes, so serving
+The app has no client-side routes beyond hash fragments, so serving
 `index.html` at the root is sufficient. A catch-all rewrite to
 `index.html` is still a safe default on hosts that support it.
 
@@ -64,5 +75,7 @@ visitor's browser.
 - [ ] `npm run lint` passes
 - [ ] `npm test` passes
 - [ ] `npm run build` succeeds
-- [ ] `upgradeUrl` in `src/config/monetization.ts` points at your real checkout
-- [ ] `devUnlockPremium` is `false`
+- [ ] `VITE_UPGRADE_URL` points at your real checkout
+- [ ] `VITE_ENABLE_TEST_MODE` is **not** set
+- [ ] `npm run preview` smoke-test: landing page, `#/app` editor, free
+      gating modal, print/PDF

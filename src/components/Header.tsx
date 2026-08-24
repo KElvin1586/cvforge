@@ -10,10 +10,16 @@ export function Header({ onPrint }: { onPrint: () => void }) {
     <header className="no-print sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-700 dark:bg-slate-900/90">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <span aria-hidden="true" className="text-xl">🛠️</span>
-          <h1 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
-            CVForge
-          </h1>
+          <a
+            href="#/"
+            className="flex items-center gap-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="CVForge home"
+          >
+            <span aria-hidden="true" className="text-xl">🛠️</span>
+            <h1 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+              CVForge
+            </h1>
+          </a>
           <span
             className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
               isPremium
