@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  margin: 0;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .print-area {
+    display: block !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  .print-area > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm 14mm;
+  }
+}
