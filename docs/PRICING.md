@@ -32,83 +32,113 @@ Free, plus:
 
 ## Configuring price and checkout
 
-All values live in `src/config/monetization.ts` and can be overridden at
-build time with environment variables — no code changes needed:
+All values live in `src/config/monetization.ts`. The checkout URL defaults
+to the real Lemon Squeezy checkout and can be overridden at build time with
+environment variables — no code changes needed:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `VITE_PREMIUM_PRICE` | `9.99` | One-time price shown in UI |
 | `VITE_PREMIUM_CURRENCY` | `USD` | ISO 4217 currency for price formatting |
-| `VITE_UPGRADE_URL` | *(unset)* | Real checkout URL (Stripe Payment Link, Lemon Squeezy, Paddle, …) |
+| `VITE_UPGRADE_URL` | the real Lemon Squeezy checkout | Overrides the default checkout URL |
 | `VITE_ENABLE_TEST_MODE` | *(unset)* | Enables the internal test checkout (dev/QA only — never in production) |
 
-Example production build:
+The production checkout is:
 
-```bash
-VITE_UPGRADE_URL="https://buy.stripe.com/your-link" \
-VITE_PREMIUM_PRICE="9.99" \
-VITE_PREMIUM_CURRENCY="USD" \
-npm run build
+```
+https://kelvindigitaltools.lemonsqueezy.com/checkout/buy/5a9a0680-dbb4-4c1b-b38c-02c8bbd20fe1
 ```
 
-If `VITE_UPGRADE_URL` is not set and test mode is disabled, the upgrade
-buttons show an honest "checkout not yet configured" notice instead of
-sending users anywhere — CVForge never points users at placeholder domains.
+A plain `npm run build` ships with this URL baked in. To use a different
+provider/link, override it:
 
-## Connecting a real payment provider
+```bash
+VITE_UPGRADE_URL="https://your-real-checkout-url" npm run build
+```
 
-CVForge does not process payments itself — the upgrade buttons simply open
-the checkout link you configure. To go live:
+## How Premium activation works (Lemon Squeezy)
 
-1. **Create the product** in your chosen payment provider (Stripe, Lemon
-   Squeezy, Paddle, Gumroad, …) — e.g. "CVForge Premium" as a one-time
-   product at your price.
-2. **Create the checkout/payment link** for that product in the provider's
-   dashboard.
-3. **Set `VITE_UPGRADE_URL` to that URL** — either in a local `.env` file
-   (copy [.env.example](../.env.example)) or in your host's environment
-   variables:
+CVForge does not process payments or store card data — checkout is hosted
+by Lemon Squeezy. The full customer flow:
 
-   ```bash
-   VITE_UPGRADE_URL=https://YOUR_REAL_CHECKOUT_URL
-   ```
+1. A Free user clicks any 🔒 Premium feature (or **Upgrade**).
+2. The upgrade modal opens, showing the feature, the Premium benefit list,
+   and the price.
+3. **Continue to checkout** opens the Lemon Squeezy checkout in a new tab.
+4. The customer pays; Lemon Squeezy emails them a **license key**.
+5. Back in CVForge, the customer opens **#/activate** (linked from the
+   modal and the plan badge) and pastes the key.
+6. The app calls Lemon Squeezy's real license API
+   (`POST /v1/licenses/activate`), which binds the key to a device
+   "instance". Only a genuine, in-limit, non-expired key succeeds.
+7. Premium unlocks and the activation is persisted locally
+   (`cvforge:license`).
 
-   Use the exact link your provider issued. Do not use `example.com` or any
-   other placeholder domain — CVForge intentionally ships with no default
-   checkout URL.
-4. **Rebuild the application** (`npm run build`). `VITE_*` variables are
-   baked into the static bundle at build time; changing them without
-   rebuilding has no effect.
-5. **Test the checkout**: deploy the rebuilt bundle, click any 🔒 Premium
-   feature → **Continue to checkout**, and walk through the provider's
-   checkout (use the provider's test mode if available). Confirm the
-   upgrade button opens your real link in a new tab.
-6. **Keep secrets out of the frontend.** Never put private API keys,
-   secret keys, webhook signing secrets, or any payment credentials in
-   `VITE_*` variables or anywhere in this codebase — everything prefixed
-   with `VITE_` is publicly visible in the shipped JavaScript. Only public
-   links and publishable identifiers belong here. Anything secret must
-   live only in your provider's dashboard or on a server you operate.
+On every subsequent load the app re-validates the stored key+instance
+(`POST /v1/licenses/validate`):
 
-### Development test mode ≠ real customer payment
+- still valid → stays Premium;
+- refunded / revoked / disabled / expired → reverts to Free;
+- network unreachable → keeps the current plan (offline use stays Premium).
+
+The customer can release a device from **#/activate** via **Deactivate
+this device** (`POST /v1/licenses/deactivate`) so the key can be used on
+another device.
+
+### Why no serverless endpoint is needed here
+
+Requirement 11 of the original brief asked for a server-side verification
+endpoint if the frontend could not verify a purchase securely. Lemon
+Squeezy's license endpoints are **public by design** (they require no
+secret API key and are served with permissive CORS), so the browser can
+call them directly and the verification is genuine — no secret is exposed
+and no proxy is required. If you switch to a provider whose verification
+API needs a secret key (e.g. Stripe), you would add a small serverless
+function to hold that secret; do not put it in a `VITE_*` variable.
+
+### Honest limitation
+
+Verification of the license is real (a fake or guessed key is rejected by
+Lemon Squeezy). However, because CVForge is a fully client-side app, the
+*enforcement* of the resulting plan runs in the browser. A determined,
+technically skilled user could patch local state or the shipped JS to flip
+the plan flag. This is inherent to any static, serverless frontend and is
+not something this codebase claims to prevent.
+
+## Lemon Squeezy dashboard setup
+
+For the store owner, the required product settings are:
+
+1. **Create the store / product.** In the Lemon Squeezy dashboard, create a
+   product named e.g. "CVForge Premium".
+2. **One-time price.** Set it to $9.99 (or your price) as a **one-time /
+   lifetime** product, not a subscription.
+3. **Enable license keys.** Under the product, turn on **License keys** so
+   each purchase generates a unique key and emails it to the customer.
+4. **Set an activation limit** (e.g. 3 devices) so a single key can't be
+   shared unlimited times. Each `activate` call consumes one seat; the app
+   exposes **Deactivate** to free a seat.
+5. **Copy the checkout link** from the product's **Share** menu. That is
+   the URL baked into `src/config/monetization.ts`.
+6. **Secrets stay in Lemon Squeezy.** Never copy your Lemon Squeezy API
+   key, webhook signing secret, or store secret into the frontend or a
+   `VITE_*` variable — they are not needed for license validation.
+
+## Development test mode ≠ real customer payment
 
 The internal test checkout (`#/checkout`) exists **only** to exercise the
 Free/Premium gating during development and QA. It flips a local
-`localStorage` flag and processes, simulates, and claims **no** payment.
-It is available only in `vite dev` or builds made with
-`VITE_ENABLE_TEST_MODE=true`. Never enable it in a production build, and
-never present it to customers as a purchase.
+entitlement flag and processes, simulates, and claims **no** payment. It
+is compiled out of production builds entirely (dead-code-eliminated unless
+`vite dev` or `VITE_ENABLE_TEST_MODE=true`). Never enable it in a
+production build, and never present it to customers as a purchase.
 
-## Upgrade flow
+## Upgrade flow summary
 
 1. A Free user clicks any 🔒 Premium feature.
-2. The upgrade modal opens, showing the feature, the Premium benefit list,
-   and the configured price.
-3. **Continue to checkout** opens the configured checkout URL (new tab for
-   external providers; the internal test page in dev/test builds).
-4. After a successful purchase, set `localStorage["cvforge:plan"]` to
-   `"premium"` on the buyer's device (e.g. on your payment success redirect
-   page). The app reads this key on load.
+2. The upgrade modal opens (feature, benefits, price).
+3. **Continue to checkout** → real Lemon Squeezy checkout (new tab).
+4. Customer pays, receives a license key by email.
+5. **#/activate** → enter key → verified against Lemon Squeezy → Premium.
+6. Premium persists across reload; re-validated on load; deactivate releases the device.
 
-No payment processing, payment simulation, or license validation exists in
-this codebase, and none is claimed.

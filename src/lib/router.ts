@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
-export type Route = 'landing' | 'app' | 'checkout';
+export type Route = 'landing' | 'app' | 'checkout' | 'activate';
 
 export function parseRoute(hash: string): Route {
   if (hash.startsWith('#/app')) return 'app';
   if (hash.startsWith('#/checkout')) return 'checkout';
+  if (hash.startsWith('#/activate')) return 'activate';
   // '#/', '#/features', '#/pricing', empty, unknown → landing page
   return 'landing';
 }
@@ -12,6 +13,7 @@ export function parseRoute(hash: string): Route {
 const TITLES: Record<Route, string> = {
   landing: 'CVForge — Professional CV & Resume Builder',
   app: 'CVForge — CV Editor',
+  activate: 'CVForge — Activate Premium',
   // The test-checkout title is only compiled into dev/test builds; the
   // production build does not include the test checkout at all.
   checkout:

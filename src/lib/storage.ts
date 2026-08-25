@@ -1,5 +1,6 @@
 import type { CvDocument, CvVersion } from '../types/cv';
 import type { Plan } from './entitlements';
+import type { LicenseActivation } from './license';
 
 const KEYS = {
   cvs: 'cvforge:cvs',
@@ -7,6 +8,7 @@ const KEYS = {
   plan: 'cvforge:plan',
   theme: 'cvforge:theme',
   versions: 'cvforge:versions',
+  license: 'cvforge:license',
 } as const;
 
 function readJson<T>(key: string, fallback: T): T {
@@ -79,6 +81,23 @@ export function loadVersions(): CvVersion[] {
 
 export function saveVersions(versions: CvVersion[]): void {
   writeJson(KEYS.versions, versions);
+}
+
+/** Persisted device-bound license activation (null when not activated). */
+export function loadLicense(): LicenseActivation | null {
+  const lic = readJson<LicenseActivation | null>(KEYS.license, null);
+  if (
+    lic &&
+    typeof lic.licenseKey === 'string' &&
+    typeof lic.instanceId === 'string'
+  ) {
+    return lic;
+  }
+  return null;
+}
+
+export function saveLicense(license: LicenseActivation | null): void {
+  writeJson(KEYS.license, license);
 }
 
 export function clearAll(): void {

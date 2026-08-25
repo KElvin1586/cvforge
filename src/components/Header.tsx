@@ -20,15 +20,19 @@ export function Header({ onPrint }: { onPrint: () => void }) {
               CVForge
             </h1>
           </a>
-          <span
+          <a
+            href="#/activate"
+            title={
+              isPremium ? 'Manage your Premium license' : 'Activate Premium'
+            }
             className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
               isPremium
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/50 dark:text-emerald-300'
                 : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
             }`}
           >
             {isPremium ? 'Premium' : 'Free'}
-          </span>
+          </a>
         </div>
 
         <div className="ml-auto flex items-center gap-2">

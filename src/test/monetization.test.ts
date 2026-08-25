@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  LEMONSQUEEZY_CHECKOUT_URL,
   MONETIZATION,
   TEST_CHECKOUT_ROUTE,
   formatPremiumPrice,
@@ -11,6 +12,14 @@ describe('monetization configuration', () => {
   it('has a positive price and ISO currency', () => {
     expect(MONETIZATION.premiumPrice).toBeGreaterThan(0);
     expect(MONETIZATION.premiumCurrency).toMatch(/^[A-Z]{3}$/);
+  });
+
+  it('points at the real Lemon Squeezy checkout by default', () => {
+    // Production must ship with a real checkout URL, not a placeholder.
+    expect(MONETIZATION.upgradeUrl).toBe(LEMONSQUEEZY_CHECKOUT_URL);
+    expect(MONETIZATION.upgradeUrl).toMatch(
+      /^https:\/\/[a-z0-9-]+\.lemonsqueezy\.com\/checkout\/buy\//,
+    );
   });
 
   it('never uses a placeholder documentation domain for checkout', () => {
@@ -58,9 +67,10 @@ describe('monetization configuration', () => {
 });
 
 describe('hash router', () => {
-  it('routes the app, checkout, and landing hashes', () => {
+  it('routes the app, checkout, activate, and landing hashes', () => {
     expect(parseRoute('#/app')).toBe('app');
     expect(parseRoute('#/checkout')).toBe('checkout');
+    expect(parseRoute('#/activate')).toBe('activate');
     expect(parseRoute('#/')).toBe('landing');
     expect(parseRoute('')).toBe('landing');
     expect(parseRoute('#/pricing')).toBe('landing');

@@ -118,6 +118,17 @@ export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
           </button>
         </div>
 
+        <p className="mt-3 text-center text-xs text-slate-500 dark:text-slate-400">
+          Already purchased?{' '}
+          <a
+            href="#/activate"
+            onClick={onClose}
+            className="font-semibold text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Activate your license key
+          </a>
+        </p>
+
         <p className="mt-3 text-xs text-slate-400">
           Your CV data stays on this device.
           {isExternal && ' Checkout opens in a new tab.'}

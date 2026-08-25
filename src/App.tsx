@@ -11,6 +11,7 @@ import { AtsPanel } from './components/AtsPanel';
 import { createEmptyCv, createSampleCv } from './types/cv';
 import { useHashRoute } from './lib/router';
 import { LandingPage } from './pages/LandingPage';
+import { ActivatePage } from './pages/ActivatePage';
 
 // The internal test checkout exists ONLY in development/test builds.
 // import.meta.env values are compile-time constants, so in a production
@@ -184,6 +185,7 @@ function Shell() {
 function Routed() {
   const route = useHashRoute();
   if (route === 'app') return <Shell />;
+  if (route === 'activate') return <ActivatePage />;
   if (route === 'checkout') {
     return TestCheckout ? (
       <Suspense fallback={null}>
