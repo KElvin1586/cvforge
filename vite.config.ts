@@ -2,6 +2,8 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  // GitHub Pages serves the site from a project subpath.
+  base: '/cvforge/',
   plugins: [react()],
   preview: {
     allowedHosts: [
