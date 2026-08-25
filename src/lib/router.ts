@@ -12,7 +12,12 @@ export function parseRoute(hash: string): Route {
 const TITLES: Record<Route, string> = {
   landing: 'CVForge — Professional CV & Resume Builder',
   app: 'CVForge — CV Editor',
-  checkout: 'CVForge — Development Test Checkout',
+  // The test-checkout title is only compiled into dev/test builds; the
+  // production build does not include the test checkout at all.
+  checkout:
+    import.meta.env.DEV || import.meta.env.VITE_ENABLE_TEST_MODE === 'true'
+      ? 'CVForge — Development Test Checkout'
+      : 'CVForge',
 };
 
 /** Tiny hash router — no dependencies, shareable URLs, no server config. */

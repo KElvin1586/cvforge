@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -32,6 +33,14 @@ export function UpgradeProvider({ children }: { children: ReactNode }) {
   const openUpgrade = useCallback((feature?: Feature) => {
     setModalFeature(feature ?? null);
     setModalOpen(true);
+  }, []);
+
+  // A route change always dismisses the modal — it must never linger over
+  // a different page (e.g. checkout, landing).
+  useEffect(() => {
+    const close = () => setModalOpen(false);
+    window.addEventListener('hashchange', close);
+    return () => window.removeEventListener('hashchange', close);
   }, []);
 
   const requireFeature = useCallback(

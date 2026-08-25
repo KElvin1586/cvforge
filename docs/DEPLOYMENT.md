@@ -23,6 +23,41 @@ Deploy the contents of `dist/`.
 > the internal test checkout, which lets any visitor grant themselves
 > Premium locally.
 
+## Configuring the real checkout URL
+
+`VITE_UPGRADE_URL` is the only intentionally unshipped value: the
+repository contains no default checkout link by design. Before a
+production release:
+
+1. Create the product (e.g. "CVForge Premium", one-time price) in your
+   chosen payment provider's dashboard.
+2. Create the checkout/payment link for that product.
+3. Set `VITE_UPGRADE_URL` to the exact link your provider issued — in your
+   host's environment variables or a local `.env` (see
+   [.env.example](../.env.example)):
+
+   ```bash
+   VITE_UPGRADE_URL=https://YOUR_REAL_CHECKOUT_URL
+   ```
+
+   Never use `example.com` or another placeholder domain. If the variable
+   is unset, the app shows "checkout not yet configured" instead of
+   sending users anywhere.
+4. Rebuild (`npm run build`) — `VITE_*` values are baked into the static
+   bundle at build time.
+5. Test the checkout end-to-end on the deployed site: open the upgrade
+   modal and confirm **Continue to checkout** opens your real link in a
+   new tab, then walk through the provider's own test mode if available.
+6. Never put private API keys, secret keys, webhook signing secrets, or
+   any payment credentials in `VITE_*` variables or anywhere in this
+   repository — everything in the frontend bundle is public. Secrets
+   belong only in your provider's dashboard or a server you operate.
+
+The development/test Premium mode (`#/checkout`, enabled by `vite dev` or
+`VITE_ENABLE_TEST_MODE=true`) is a QA convenience that flips a local
+entitlement flag — it is **not** a real customer payment and must never be
+enabled in a production build.
+
 ## Static hosts
 
 ### Netlify

@@ -5,3 +5,8 @@ dist-ssr
 .DS_Store
 coverage
 .vite
+
+# Local env files (may contain real checkout URLs)
+.env
+.env.local
+.env.*.local

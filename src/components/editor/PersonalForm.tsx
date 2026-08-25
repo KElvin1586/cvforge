@@ -32,7 +32,7 @@ export function PersonalForm() {
         type="email"
         value={p.email}
         onChange={(v) => set({ email: v })}
-        placeholder="alex@example.com"
+        placeholder="you@yourmail.com"
       />
       <TextField
         label="Phone"

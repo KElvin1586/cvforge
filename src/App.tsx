@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 import { AppProvider, useApp } from './state/AppContext';
 import { UpgradeProvider } from './state/UpgradeContext';
 import { Header } from './components/Header';
@@ -11,7 +11,41 @@ import { AtsPanel } from './components/AtsPanel';
 import { createEmptyCv, createSampleCv } from './types/cv';
 import { useHashRoute } from './lib/router';
 import { LandingPage } from './pages/LandingPage';
-import { TestCheckoutPage } from './pages/TestCheckoutPage';
+
+// The internal test checkout exists ONLY in development/test builds.
+// import.meta.env values are compile-time constants, so in a production
+// build this branch is dead-code-eliminated and the test checkout module
+// (including the Premium entitlement toggle) is excluded from the bundle.
+const TestCheckout =
+  import.meta.env.DEV || import.meta.env.VITE_ENABLE_TEST_MODE === 'true'
+    ? lazy(() =>
+        import('./pages/TestCheckoutPage').then((m) => ({
+          default: m.TestCheckoutPage,
+        })),
+      )
+    : null;
+
+function CheckoutUnavailable() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-slate-100 p-6 text-center dark:bg-slate-900">
+      <div className="max-w-md rounded-xl bg-white p-8 shadow dark:bg-slate-800">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+          Page not available
+        </h1>
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+          This build does not include a checkout page. The Premium upgrade
+          link is configured by the site owner at build time.
+        </p>
+        <a
+          href="#/"
+          className="mt-6 inline-block rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 dark:bg-slate-100 dark:text-slate-900"
+        >
+          ← Back to CVForge
+        </a>
+      </div>
+    </main>
+  );
+}
 
 type Tab = 'editor' | 'coverLetter' | 'ats';
 
@@ -150,7 +184,15 @@ function Shell() {
 function Routed() {
   const route = useHashRoute();
   if (route === 'app') return <Shell />;
-  if (route === 'checkout') return <TestCheckoutPage />;
+  if (route === 'checkout') {
+    return TestCheckout ? (
+      <Suspense fallback={null}>
+        <TestCheckout />
+      </Suspense>
+    ) : (
+      <CheckoutUnavailable />
+    );
+  }
   return <LandingPage />;
 }
 
