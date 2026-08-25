@@ -17,7 +17,7 @@ product on its own.
 
 ## Premium — one-time payment
 
-**Default price: $9.99 USD** (configurable — see below). Everything in
+**Default price: KSh 1,299** (configurable — see below). Everything in
 Free, plus:
 
 - Unlimited saved CVs
@@ -38,8 +38,8 @@ environment variables — no code changes needed:
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `VITE_PREMIUM_PRICE` | `9.99` | One-time price shown in UI |
-| `VITE_PREMIUM_CURRENCY` | `USD` | ISO 4217 currency for price formatting |
+| `VITE_PREMIUM_PRICE` | `1299` | One-time price shown in UI |
+| `VITE_PREMIUM_CURRENCY` | `KES` | ISO 4217 currency for price formatting |
 | `VITE_UPGRADE_URL` | the real Lemon Squeezy checkout | Overrides the default checkout URL |
 | `VITE_ENABLE_TEST_MODE` | *(unset)* | Enables the internal test checkout (dev/QA only — never in production) |
 
@@ -111,7 +111,7 @@ For the store owner, the required product settings are:
 
 1. **Create the store / product.** In the Lemon Squeezy dashboard, create a
    product named e.g. "CVForge Premium".
-2. **One-time price.** Set it to $9.99 (or your price) as a **one-time /
+2. **One-time price.** Set it to KSh 1,299 (or your price) as a **one-time /
    lifetime** product, not a subscription.
 3. **Enable license keys.** Under the product, turn on **License keys** so
    each purchase generates a unique key and emails it to the customer.

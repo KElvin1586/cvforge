@@ -10,7 +10,7 @@ CVForge deployment. It is descriptive, not a legal contract.
 
 ## End-user plans
 
-| | Free ($0) | Premium (one-time, default $9.99) |
+| | Free ($0) | Premium (one-time, default KSh 1,299) |
 | --- | --- | --- |
 | Full CV editor (all 9 sections) | ✅ | ✅ |
 | Print / PDF export | ✅ | ✅ |

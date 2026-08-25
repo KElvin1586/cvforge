@@ -56,7 +56,7 @@ database, and no tracking — all data is stored in your browser's
 
 ## Plans
 
-| | Free ($0) | Premium (one-time, default $9.99) |
+| | Free ($0) | Premium (one-time, default KSh 1,299) |
 | --- | --- | --- |
 | CV editor, all sections | ✅ | ✅ |
 | Templates | Classic + Modern | All 5 |

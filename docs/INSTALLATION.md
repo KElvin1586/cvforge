@@ -46,7 +46,7 @@ and overridable at build time via environment variables:
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `VITE_PREMIUM_PRICE` | `9.99` | One-time price shown in the upgrade modal and pricing pages |
+| `VITE_PREMIUM_PRICE` | `1299` | One-time price shown in the upgrade modal and pricing pages |
 | `VITE_PREMIUM_CURRENCY` | `USD` | ISO 4217 currency for price formatting |
 | `VITE_UPGRADE_URL` | *(unset)* | Real checkout URL (Stripe Payment Link, Lemon Squeezy, Paddle, …). When set, upgrade buttons open it in a new tab. |
 | `VITE_ENABLE_TEST_MODE` | *(unset)* | `true` enables the internal test checkout page at `/#/checkout` and routes upgrade buttons to it. For development/QA only — **never enable in production**. In `vite dev`, test mode is always on. |

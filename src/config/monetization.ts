@@ -18,8 +18,8 @@
  * in any VITE_* variable — those would be publicly visible in the bundle.
  *
  * Build-time overrides (optional):
- *   VITE_PREMIUM_PRICE      e.g. "9.99"
- *   VITE_PREMIUM_CURRENCY   e.g. "USD"
+ *   VITE_PREMIUM_PRICE      e.g. "1299"
+ *   VITE_PREMIUM_CURRENCY   e.g. "KES"
  *   VITE_UPGRADE_URL        override the checkout URL (defaults to the
  *                           real Lemon Squeezy checkout below)
  *
@@ -59,8 +59,9 @@ export interface MonetizationConfig {
 }
 
 export const MONETIZATION: MonetizationConfig = {
-  premiumPrice: envNumber(import.meta.env?.VITE_PREMIUM_PRICE, 9.99),
-  premiumCurrency: import.meta.env?.VITE_PREMIUM_CURRENCY || 'USD',
+  // Matches the actual Lemon Squeezy product: KSh 1,299 one-time.
+  premiumPrice: envNumber(import.meta.env?.VITE_PREMIUM_PRICE, 1299),
+  premiumCurrency: import.meta.env?.VITE_PREMIUM_CURRENCY || 'KES',
   upgradeUrl: import.meta.env?.VITE_UPGRADE_URL || LEMONSQUEEZY_CHECKOUT_URL,
   testMode:
     import.meta.env?.DEV === true ||
@@ -90,9 +91,13 @@ export function resolveUpgradeHref(
 export function formatPremiumPrice(
   config: MonetizationConfig = MONETIZATION,
 ): string {
-  return new Intl.NumberFormat('en-US', {
+  // Kenyan customers read "Ksh 1,299"; the en-KE locale gives that form.
+  const locale = config.premiumCurrency === 'KES' ? 'en-KE' : 'en-US';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: config.premiumCurrency,
+    // Drop trailing ".00" for whole-number prices like KSh 1,299.
+    maximumFractionDigits: Number.isInteger(config.premiumPrice) ? 0 : 2,
   }).format(config.premiumPrice);
 }
 

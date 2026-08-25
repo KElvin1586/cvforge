@@ -29,7 +29,9 @@ describe('monetization configuration', () => {
   });
 
   it('formats the premium price', () => {
-    expect(formatPremiumPrice()).toContain('9.99');
+    // Default product price is KSh 1,299 (matches the Lemon Squeezy product).
+    expect(formatPremiumPrice()).toContain('1,299');
+    expect(formatPremiumPrice()).toMatch(/ksh/i);
   });
 
   it('prefers the configured checkout URL over the test page', () => {
