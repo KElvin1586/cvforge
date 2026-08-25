@@ -3,7 +3,7 @@ import { useApp } from '../state/AppContext';
 import { useUpgrade } from '../state/UpgradeContext';
 import { LicenseError } from '../lib/license';
 import {
-  formatPremiumPrice,
+  formatPremiumPriceFull,
   resolveUpgradeHref,
   MONETIZATION,
 } from '../config/monetization';
@@ -120,7 +120,7 @@ export function ActivatePage() {
                 rel="noopener noreferrer"
                 className="mt-4 block rounded-lg bg-amber-400 px-4 py-3 text-center text-sm font-bold text-slate-900 hover:bg-amber-300"
               >
-                Buy Premium — {formatPremiumPrice(MONETIZATION)} one-time →
+                Buy Premium — {formatPremiumPriceFull(MONETIZATION)} one-time →
               </a>
             )}
 

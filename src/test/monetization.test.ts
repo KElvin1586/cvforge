@@ -4,6 +4,8 @@ import {
   MONETIZATION,
   TEST_CHECKOUT_ROUTE,
   formatPremiumPrice,
+  formatPremiumPriceFull,
+  formatPremiumPriceUsd,
   resolveUpgradeHref,
 } from '../config/monetization';
 import { parseRoute } from '../lib/router';
@@ -34,11 +36,25 @@ describe('monetization configuration', () => {
     expect(formatPremiumPrice()).toMatch(/ksh/i);
   });
 
+  it('shows an approximate USD equivalent alongside the local price', () => {
+    expect(formatPremiumPriceUsd()).toBe('≈ $10');
+    expect(formatPremiumPriceFull()).toMatch(/ksh\s1,299 \(≈ \$10\)/i);
+  });
+
+  it('hides the USD equivalent when priced in USD or disabled', () => {
+    const usdPriced = { ...MONETIZATION, premiumCurrency: 'USD' };
+    expect(formatPremiumPriceUsd(usdPriced)).toBe('');
+    const disabled = { ...MONETIZATION, usdEquivalent: 0 };
+    expect(formatPremiumPriceUsd(disabled)).toBe('');
+    expect(formatPremiumPriceFull(disabled)).toBe(formatPremiumPrice(disabled));
+  });
+
   it('prefers the configured checkout URL over the test page', () => {
     expect(
       resolveUpgradeHref({
         premiumPrice: 9.99,
         premiumCurrency: 'USD',
+        usdEquivalent: 0,
         upgradeUrl: 'https://checkout.provider.com/abc',
         testMode: true,
       }),
@@ -50,6 +66,7 @@ describe('monetization configuration', () => {
       resolveUpgradeHref({
         premiumPrice: 9.99,
         premiumCurrency: 'USD',
+        usdEquivalent: 0,
         upgradeUrl: '',
         testMode: true,
       }),
@@ -61,6 +78,7 @@ describe('monetization configuration', () => {
       resolveUpgradeHref({
         premiumPrice: 9.99,
         premiumCurrency: 'USD',
+        usdEquivalent: 0,
         upgradeUrl: '',
         testMode: false,
       }),

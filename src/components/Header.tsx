@@ -1,6 +1,6 @@
 import { useApp } from '../state/AppContext';
 import { useUpgrade } from '../state/UpgradeContext';
-import { formatPremiumPrice } from '../config/monetization';
+import { formatPremiumPriceFull } from '../config/monetization';
 
 export function Header({ onPrint }: { onPrint: () => void }) {
   const { state, dispatch } = useApp();
@@ -66,7 +66,7 @@ export function Header({ onPrint }: { onPrint: () => void }) {
               onClick={() => openUpgrade()}
               className="rounded-md bg-amber-500 px-3 py-1.5 text-sm font-semibold text-white hover:bg-amber-600"
             >
-              Upgrade — {formatPremiumPrice()}
+              Upgrade — {formatPremiumPriceFull()}
             </button>
           )}
         </div>

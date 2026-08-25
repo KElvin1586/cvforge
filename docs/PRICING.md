@@ -40,6 +40,7 @@ environment variables — no code changes needed:
 | --- | --- | --- |
 | `VITE_PREMIUM_PRICE` | `1299` | One-time price shown in UI |
 | `VITE_PREMIUM_CURRENCY` | `KES` | ISO 4217 currency for price formatting |
+| `VITE_PREMIUM_USD_EQUIVALENT` | `10` | Approximate USD equivalent shown alongside the local price (e.g. "Ksh 1,299 (≈ $10)"); `0` hides it |
 | `VITE_UPGRADE_URL` | the real Lemon Squeezy checkout | Overrides the default checkout URL |
 | `VITE_ENABLE_TEST_MODE` | *(unset)* | Enables the internal test checkout (dev/QA only — never in production) |
 

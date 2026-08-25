@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import {
   MONETIZATION,
-  formatPremiumPrice,
+  formatPremiumPriceFull,
   resolveUpgradeHref,
 } from '../config/monetization';
 import { PREMIUM_BENEFITS, type FeatureInfo } from '../lib/entitlements';
@@ -83,7 +83,7 @@ export function UpgradeModal({ open, feature, onClose }: UpgradeModalProps) {
         </ul>
 
         <p className="mt-4 text-2xl font-bold text-slate-900 dark:text-white">
-          {formatPremiumPrice()}{' '}
+          {formatPremiumPriceFull()}{' '}
           <span className="text-sm font-normal text-slate-500">
             one-time payment
           </span>

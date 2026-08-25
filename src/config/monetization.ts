@@ -50,6 +50,11 @@ export interface MonetizationConfig {
   /** ISO 4217 currency code used for price formatting. */
   premiumCurrency: string;
   /**
+   * Approximate USD equivalent shown alongside the local price for
+   * international visitors (e.g. "Ksh 1,299 (≈ $10)"). Set to 0 to hide.
+   */
+  usdEquivalent: number;
+  /**
    * Real external checkout URL. Defaults to the Lemon Squeezy checkout;
    * may be overridden at build time with VITE_UPGRADE_URL.
    */
@@ -62,6 +67,9 @@ export const MONETIZATION: MonetizationConfig = {
   // Matches the actual Lemon Squeezy product: KSh 1,299 one-time.
   premiumPrice: envNumber(import.meta.env?.VITE_PREMIUM_PRICE, 1299),
   premiumCurrency: import.meta.env?.VITE_PREMIUM_CURRENCY || 'KES',
+  // Approximate USD equivalent for international visitors (~$10 at the time
+  // of writing). Adjust with VITE_PREMIUM_USD_EQUIVALENT if rates move.
+  usdEquivalent: envNumber(import.meta.env?.VITE_PREMIUM_USD_EQUIVALENT, 10),
   upgradeUrl: import.meta.env?.VITE_UPGRADE_URL || LEMONSQUEEZY_CHECKOUT_URL,
   testMode:
     import.meta.env?.DEV === true ||
@@ -99,5 +107,35 @@ export function formatPremiumPrice(
     // Drop trailing ".00" for whole-number prices like KSh 1,299.
     maximumFractionDigits: Number.isInteger(config.premiumPrice) ? 0 : 2,
   }).format(config.premiumPrice);
+}
+
+/**
+ * Approximate USD equivalent for international visitors, e.g. "≈ $10".
+ * Empty string when disabled (usdEquivalent <= 0) or when the product is
+ * already priced in USD.
+ */
+export function formatPremiumPriceUsd(
+  config: MonetizationConfig = MONETIZATION,
+): string {
+  if (config.usdEquivalent <= 0 || config.premiumCurrency === 'USD') {
+    return '';
+  }
+  const usd = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: Number.isInteger(config.usdEquivalent) ? 0 : 2,
+  }).format(config.usdEquivalent);
+  return `≈ ${usd}`;
+}
+
+/**
+ * Full display price with the USD equivalent, e.g. "Ksh 1,299 (≈ $10)".
+ */
+export function formatPremiumPriceFull(
+  config: MonetizationConfig = MONETIZATION,
+): string {
+  const base = formatPremiumPrice(config);
+  const usd = formatPremiumPriceUsd(config);
+  return usd ? `${base} (${usd})` : base;
 }
 

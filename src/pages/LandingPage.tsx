@@ -1,6 +1,6 @@
 import {
   MONETIZATION,
-  formatPremiumPrice,
+  formatPremiumPriceFull,
   resolveUpgradeHref,
 } from '../config/monetization';
 import {
@@ -20,7 +20,7 @@ const FREE_FEATURES = [
   'Dark / light mode',
 ];
 
-const price = () => formatPremiumPrice();
+const price = () => formatPremiumPriceFull();
 
 export function LandingPage() {
   const upgradeHref = resolveUpgradeHref();
